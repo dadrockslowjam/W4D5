@@ -39,25 +39,41 @@ RSpec.describe UsersController, type: :controller do
     describe 'POST#create' do
         before(:each) do
             create(:user)
-            allow(:subject).to receive(:current_user).and_return(User.last)
+            allow(subject).to receive(:current_user).and_return(User.last)
         end
 
-        let(:valid_params) {{ user: {name: 'chewbacca', password: 'starwars'}}}
-        let(:invalid_params) {{ user: {name: 'chewbacca', password: 'star'}}}
+        let(:valid_params) {{ user: {name: 'Han Solo', password: 'starwars'}}}
+        let(:invalid_params) {{ user: {name: 'Like Skywalker', password: 'star'}}}
 
         context 'with valid password' do
             it 'creates the user' do
-                post :create, params: :valid_params
-                expect(User.last.name).to eq('chewbacca')
+                post :create, params: valid_params
+                expect(User.last.name).to eq('Han Solo')
             end
 
             it 'redirects to the users index' do
+                post :create, params: valid_params
                 expect(response).to redirect_to users_url
             end
         end
 
         context 'with invalid passord' do
-            it 'should stay on page'
+            before(:each) do
+                post :create, params: invalid_params
+            end
+
+            it 'doesnt create the user' do
+                expect(User.last.name).to_not eq('Han Solo')
+            end
+
+            it 'should stay on page' do
+                expect(response).to have_http_status(302)
+                expect(response).to redirect_to new_user_url
+            end
+
+            it 'adds errors to the flash cookie' do
+                expect(flash[:errors]).to be_present
+            end
         end
     end
 end

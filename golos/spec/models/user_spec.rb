@@ -14,6 +14,7 @@ RSpec.describe User, type: :model do
             create(:user) 
         end
          it {should validate_uniqueness_of(:session_token)}
+         it {should validate_uniqueness_of(:name)}
     end
 
     describe "#is_password?" do
